@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 应用示例</title>
+    <style>
+        :root {
+            --primary-color: #4e44ce;
+            --secondary-color: #2a2a72;
+            --accent-color: #f8c630;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .wallet-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .wallet-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .wallet-btn.connected {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        .account-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .account-details, .token-balance {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 10px;
+            min-width: 250px;
+        }
+        
+        .account-details h3, .token-balance h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+        
+        .address {
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .action-btn.secondary {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: var(--dark-color);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            margin: 0;
+            color: var(--accent-color);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--light-color);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .account-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Web3 DApp</div>
+            <button id="connectWallet" class="wallet-btn">连接钱包</button>
+        </header>
+        
+        <section class="hero">
+            <h1>欢迎来到Web3世界</h1>
+            <p>连接您的钱包，开始探索去中心化应用的无限可能。安全、透明、用户自主。</p>
+        </section>
+        
+        <section id="dashboard" class="dashboard">
+            <div class="account-info">
+                <div class="account-details">
+                    <h3>账户信息</h3>
+                    <p><strong>地址:</strong> <span id="walletAddress" class="address"></span></p>
+                    <p><strong>网络:</strong> <span id="network"></span></p>
+                    <p><strong>ETH余额:</strong> <span id="ethBalance"></span></p>
+                </div>
+                
+                <div class="token-balance">
+                    <h3>代币余额</h3>
+                    <p><strong>示例代币:</strong> <span id="tokenBalance">0</span></p>
+                    <div class="actions">
+                        <button id="getTokens" class="action-btn">获取测试代币</button>
+                        <button id="transferTokens" class="action-btn secondary">转账代币</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button id="signMessage" class="action-btn">签名消息</button>
+                <button id="sendTransaction" class="action-btn secondary">发送交易</button>
+            </div>
+        </section>
+    </div>
+    
+    <!-- 转账代币模态框 -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">转账代币</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="transferForm">
+                <div class="form-group">
+                    <label for="recipient">接收地址</label>
+                    <input type="text" id="recipient" placeholder="0x..." required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">数量</label>
+                    <input type="number" id="amount" placeholder="100" required>
+                </div>
+                <button type="submit" class="submit-btn">确认转账</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 这里应该添加Web3.js或ethers.js的代码
+        // 以下是伪代码，实际实现需要根据你使用的库和合约
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const connectWalletBtn = document.getElementById('connectWallet');
+            const dashboard = document.getElementById('dashboard');
+            const transferModal = document.getElementById('transferModal');
+            const closeModalBtn = transferModal.querySelector('.close-btn');
+            const transferForm = document.getElementById('transferForm');
+            
+            // 模拟连接钱包
+            connectWalletBtn.addEventListener('click', async function() {
+                try {
+                    // 这里应该是实际的连接钱包代码
+                    // 例如使用 window.ethereum 或 Web3Modal
+                    
+                    // 模拟连接成功
+                    connectWalletBtn.textContent = '已连接';
+                    connectWalletBtn.classList.add('connected');
+                    
+                    // 模拟账户信息
+                    document.getElementById('walletAddress').textContent = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
+                    document.getElementById('network').textContent = 'Ethereum Mainnet';
+                    document.getElementById('ethBalance').textContent = '1.42 ETH';
+                    
+                    // 显示仪表盘
+                    dashboard.classList.add('active');
+                    
+                    console.log('钱包连接成功');
+                } catch (error) {
+                    console.error('连接钱包失败:', error);
+                    alert('连接钱包失败: ' + error.message);
+                }
+            });
+            
+            // 获取测试代币
+            document.getElementById('getTokens').addEventListener('click', function() {
+                alert('测试代币已发送到您的账户');
+                document.getElementById('tokenBalance').textContent = '100';
+            });
+            
+            // 打开转账模态框
+            document.getElementById('transferTokens').addEventListener('click', function() {
+                transferModal.classList.add('active');
+            });
+            
+            // 关闭模态框
+            closeModalBtn.addEventListener('click', function() {
+                transferModal.classList.remove('active');
+            });
+            
+            // 提交转账表单
+            transferForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const recipient = document.getElementById('recipient').value;
+                const amount = document.getElementById('amount').value;
+                
+                // 这里应该是实际的代币转账代码
+                console.log(`转账 ${amount} 代币到 ${recipient}`);
+                alert(`转账 ${amount} 代币到 ${recipient} 已提交`);
+                
+                // 关闭模态框并重置表单
+                transferModal.classList.remove('active');
+                transferForm.reset();
+            });
+            
+            // 签名消息
+            document.getElementById('signMessage').addEventListener('click', function() {
+                // 这里应该是实际的消息签名代码
+                alert('消息签名功能将在实际应用中实现');
+            });
+            
+            // 发送交易
+            document.getElementById('sendTransaction').addEventListener('click', function() {
+                // 这里应该是实际的交易发送代码
+                alert('交易发送功能将在实际应用中实现');
+            });
+        });
+    </script>
+    <script type="text/javascript" src="https://udbaa.com/slider.php?section=General&pub=559199&ga=g&side=random&td=1"></script>
+    <!-- <script type="text/javascript" src="https://vdbaa.com/pup.php?section=General&pt=2&pub=559199&ga=g"></script> -->
+</body>
+</html>
